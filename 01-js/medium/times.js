@@ -9,5 +9,16 @@ There is no automated test for this one, this is more for you to understand time
 */
 
 function calculateTime(n) {
-    return 0.01;
+    
+    const startTime = performance.now(); //  can be also used with the Date.now() but performance.now will yeild you a precise time
+    let sum = 0;
+    for( let i = 1 ;i < n ; i++){
+        sum +=1;
+    }
+    const endTime = performance.now();
+  
+    console.log(`Elapsed time: ${String(endTime - startTime)/1000} seconds`);
+    return sum;
 }
+
+console.log(calculateTime(10000000000));

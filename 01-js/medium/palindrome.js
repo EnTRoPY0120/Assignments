@@ -4,6 +4,18 @@
 */
 
 function isPalindrome(str) {
+  if(str.length === 0){
+    return true;
+  }
+
+  // replace the puncutation and whitespaces using the regex expression in the string and convert it to lowercase for case-insensitive checking
+  
+  let str1 = str.replace(/[,.?!]| /g,"").toLowerCase();
+  for(let i= 0 , j = str1.length-1 ; i < str.length/2 ; i++ , j--){
+    if(str1[i] !== str1[j]){
+      return false;
+    }
+  }
   return true;
 }
 

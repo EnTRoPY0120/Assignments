@@ -7,6 +7,15 @@
 
 function countVowels(str) {
     // Your code here
+    let countOfVowels = 0;
+
+    // this expression returns an array with characters matching the regex expression (vowels)
+
+    const vowels = str.match(/[aieou]/gi);
+    for(let i in vowels){
+      countOfVowels++;  // count the no.of elements in the array 
+    }
+    return countOfVowels;
 }
 
 module.exports = countVowels;

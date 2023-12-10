@@ -5,7 +5,23 @@
 */
 
 function isAnagram(str1, str2) {
+  
+  const counter = new Array(26).fill(0);
 
+  if(str1.length != str2.length){
+    return false;
+  }
+
+  for(let i = 0; i < str1.length; i++){
+    counter[str1.toLowerCase().charCodeAt(i)- 97]++;
+    counter[str2.toLowerCase().charCodeAt(i)- 97]--;
+  }
+  for(let i = 0; i < 26;i++){
+    if(counter[i] != 0){
+      return false;
+    }
+  }
+return true;
 }
 
 module.exports = isAnagram;
