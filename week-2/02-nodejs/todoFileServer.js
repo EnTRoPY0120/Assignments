@@ -1,21 +1,44 @@
 const express = require('express');
-const path = require('path');
-//const fs = require('fs');
+const fs = require('fs');
 const port = process.env.port || 3000;
-const data = require('./todos.json');
 const app = express();
 app.use(express.json());
 
+
+function findIndex(arr, id) {
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i].id === id) return i;
+  }
+  return -1;
+}
+
+
+function removeAtIndex(arr, index) {
+  const newArray = [];
+  for (let i = 0; i < arr.length; i++) {
+    if (i !== index) newArray.push(arr[i]);
+  }
+  return newArray;
+}
+
 app.get('/todos', (req, res) => {
-  res.status(200).json(data);
+  fs.readFile('todos.json', 'utf-8', (err, data) => {
+    if (err) throw err;
+    res.status(200).json(JSON.parse(data));
+  })
 });
 
 app.get('/todos/:id', (req, res) => {
-  const todoId = data.find((todoId) => todoId.id === parseInt(req.params.id));
-  if (!todoId) {
-    res.status(404).send('Enter a proper Todo id to display');
-  }
-  res.status(200).send(data.entries(todoId));
+  fs.readFile('todos.json', 'utf-8', (err, data) => {
+    if (err) throw err;
+    const todos = JSON.parse(data)
+    const todoIndex = findIndex(todos, parseInt(req.params.id));
+    if (todoIndex === -1) {
+      res.status(404).send('Todo not found');
+    } else {
+      res.status(200).json(todos[todoIndex]);
+    }
+  });
 });
 
 app.post('/todos', (req, res) => {
@@ -25,30 +48,56 @@ app.post('/todos', (req, res) => {
     description: req.body.description,
     completed: req.body.completed
   }
-  data.push(newTodo);
-  res.status(201).json(newTodo.id);
+  fs.readFile('todos.json', 'utf-8', (err, data) => {
+    if (err) throw err;
+    const todos = JSON.parse(data);
+    todos.push(newTodo);
+    fs.writeFile('todos.json', JSON.stringify(todos), (err) => {
+      if (err) throw err;
+      res.status(201).json(newTodo);
+    });
+  });
 });
 
 app.put('/todos/:id', (req, res) => {
-  const todoIndex = data.findIndex((todoIndex) => todoIndex.id === parseInt(req.params.id));
-  if (todoIndex === -1) {
-    res.status(404).send('Enter the correct Todo');
-  }
-  else {
-    data[todoIndex].title = req.body.title,
-      data[todoIndex].description = req.body.description,
-      data[todoIndex].completed = req.body.completed
-  }
-  res.status(200).send(`Todo id:${todoIndex} was updated successfully`)
+
+  fs.readFile('todos.json', 'utf-8', (err, data) => {
+    if (err) throw err;
+    const todos = JSON.parse(data);
+    const todoIndex = findIndex(todos, parseInt(req.params.id));
+    if (todoIndex === -1) {
+      res.status(404).send('Enter the right Todo to update');
+    } else {
+      const updatedTodo = {
+        id: todos[todoIndex].id,
+        title: req.body.title,
+        description: req.body.description,
+        completed: req.body.completed
+      }
+      todos[todoIndex] = updatedTodo;
+      fs.writeFile('todos.json', JSON.stringify(todos), (err) => {
+        if (err) throw err;
+        res.status(200).send('Todo was updated');
+      });
+    }
+  });
 });
 
 app.delete('/todos/:id', (req, res) => {
-  const newId = data.findIndex((index) => index.id === parseInt(req.params.id));
-  if (newId === -1) {
-    res.status(404).send('Todo was not found');
-  }
-  data.splice(newId, 1);
-  res.status(200).send(`Todo id:${newId} was deleted`);
+  fs.readFile('todos.json', 'utf-8', (err, data) => {
+    if (err) throw err;
+    const todos = JSON.parse(data);
+    const todoIndex = findIndex(todos, parseInt(req.params.id));
+    if (todoIndex === -1) {
+      res.status(404).send('Enter the correct todo to delete');
+    } else {
+      const updatedTodo = removeAtIndex(todos, todoIndex);
+      fs.writeFile('todos.json', JSON.stringify(updatedTodo), (err) => {
+        if (err) throw err;
+        res.status(200).send('Todo was deleted');
+      });
+    }
+  });
 });
 
 app.all('/*', (req, res) => {
