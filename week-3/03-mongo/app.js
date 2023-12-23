@@ -6,9 +6,8 @@ const PORT = process.env.port || 3000;
 app.use(express.json());
 // Connect to MongoDB
 mongoose.connect(
-  "mongodb+srv://VJ:Wrc9vupTYHoqhPis@cluster0.74fkbrg.mongodb.net/course_store",
+  "mongodb+srv://<user>:<password>@sscluster0.74fkbrg.mongodb.net/course_store",
 );
-
 // Define schemas
 const AdminSchema = new mongoose.Schema({
   // Schema definition here
@@ -27,7 +26,7 @@ const CourseSchema = new mongoose.Schema({
   // Schema definition here
   id: Number,
   title: String,
-  description: String,  
+  description: String,
   price: String,
   imageLink: String,
   published: Boolean,
